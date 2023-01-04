@@ -2,13 +2,13 @@
 let gridSize = 32;
 let brushSize = 1;
 let isRandomColor = false;
+let sensitiveMouse = false;
 const artboard = document.querySelector('.artboard');
 const color = document.querySelector('input.color');
 const slideContainer = document.querySelector('.slide-container');
 const brush = document.querySelector('.brush-size');
 const showGrid = document.querySelector('button.show-grid');
-const drawLine = document.querySelector('button.draw-line');
-const drawSquare = document.querySelector('button.draw-square');
+const mouseSense = document.querySelector('button.mouse-sense');
 const randomizeColors = document.querySelector('button.randomize-colors');
 const eraser = document.querySelector('button.eraser');
 const slowDraw = document.querySelector('button.slow-draw');
@@ -17,7 +17,6 @@ const loading = document.querySelector('.loading');
 
 initializeButtons();
 generateGrid();
-
 
 function initializeButtons() {
     color.addEventListener('click', () => {
@@ -62,17 +61,11 @@ function initializeButtons() {
         showGrid.classList.toggle('selected-button');
     });
     
-    // drawLine.addEventListener('click', () => {
-    //     const squares = document.querySelectorAll('.grid-square');
-    //     squares.forEach((square) => {
-    //         square.addEventListener('click', () => {
-    //             const currSquare = Array.from(squares).indexOf(square);
-    //             console.log(currSquare);
-    //         });
-    //     });
-    // });
-    
-    // drawSquare.addEventListener
+    mouseSense.addEventListener('click', () => {
+        sensitiveMouse == true ? sensitiveMouse = false : sensitiveMouse = true;
+        mouseSense.classList.toggle('selected-button');
+        generateGrid();
+    });
     
     randomizeColors.addEventListener('click', () => {
         if (isRandomColor == false) {
@@ -123,6 +116,9 @@ function initializeButtons() {
     });    
 }
 
+function opacity() {
+    return { opacity: 0.2 }
+}
 
 function generateGrid() {
     resetTools();
@@ -136,6 +132,9 @@ function generateGrid() {
     
     for (let i = 0; i < (gridSize * gridSize); i++) {
         const div = document.createElement('div');
+        if (sensitiveMouse) {
+            div.style.opacity = 0.2;
+        }
         div.classList.add('grid-square');
         artboard.appendChild(div);
     }
@@ -148,13 +147,21 @@ function generateGrid() {
     squares.forEach((square) => {
         square.addEventListener('mouseover', () => {
             if (clicked) {
+                let opacity = square.style.opacity;
+                square.style.opacity = parseFloat(opacity) + 0.2;
                 activateBrush(squares, square);
             }
         });
         square.addEventListener('mousedown', () => {
             if (clicked == false) {
                 clicked = true;
-                activateBrush(squares, square);
+                let opacity = square.style.opacity;
+                if (opacity < 1) {
+                    if (sensitiveMouse) {
+                        square.style.opacity = parseFloat(opacity) + 0.4;
+                    }
+                    activateBrush(squares, square);
+                }
             } else clicked = false
         });
         document.addEventListener('mouseup', () => {
@@ -164,7 +171,6 @@ function generateGrid() {
         });
     });
 }
-
 
 function activateBrush(squares, square) {
     if (brushSize == 1) {
@@ -195,25 +201,27 @@ function activateBrush(squares, square) {
     }
 }
 
-
+// Hex to RGB function thanks to Tim Down on Stack Overflow - https://stackoverflow.com/a/5624139/19874960
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16)
+    } : null;
+  }
+  
 function resetTools() {
     color.value = '#000000';
     isRandomColor = false;
     document.querySelectorAll('button').forEach((btn) => {
-        btn.style.opacity = '0.8';
-        btn.classList.remove('selected-button');
+        if (btn != mouseSense) {
+            btn.style.opacity = '0.8';
+            btn.classList.remove('selected-button');
+        }
     });
 }
-
 
 function generateColor() {
     return `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`; 
 }
-
-// function drawLine(squares, square) {
-
-// }
-
-// function drawSquare() {
-
-// }
