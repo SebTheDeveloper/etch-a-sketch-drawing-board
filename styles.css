@@ -62,8 +62,8 @@ body {
     padding-bottom: 1rem;;
 }
 .artboard {
-    width: 70%;
-    height: 100%;
+    aspect-ratio: 2 / 1;
+    width: max(350px, 70%);
     margin-bottom: 5rem;
     display: grid;
     background-color: white;
@@ -147,4 +147,9 @@ a {
     padding: 0.4rem;
     text-decoration: none;
     color: #2987f5;
+}
+@media (max-width: 900px) {
+    .artboard {
+        aspect-ratio: 1 / 1;
+    }
 }
